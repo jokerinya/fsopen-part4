@@ -1,0 +1,29 @@
+{
+    "name": "blogs-backend",
+    "version": "1.0.0",
+    "description": "blogs app backend api",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint ."
+    },
+    "keywords": [
+        "node",
+        "express",
+        "blog"
+    ],
+    "author": "Ibrahim Sakaci <sakacibrahim@gmail.com>",
+    "license": "MIT",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.1",
+        "express": "^4.18.1",
+        "mongoose": "^6.4.2",
+        "nodemon": "^2.0.18"
+    },
+    "devDependencies": {
+        "lint": "^0.7.0"
+    }
+}
