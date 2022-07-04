@@ -4,10 +4,10 @@
     "description": "blogs app backend api",
     "main": "index.js",
     "scripts": {
-        "start": "node index.js",
-        "dev": "nodemon index.js",
+        "start": "cross-env NODE_ENV=production node index.js",
+        "dev": "cross-env NODE_ENV=development nodemon index.js",
         "lint": "eslint .",
-        "test": "jest --verbose"
+        "test": "cross-env NODE_ENV=test jest --verbose --runInBand --forceExit"
     },
     "keywords": [
         "node",
@@ -20,13 +20,16 @@
         "cors": "^2.8.5",
         "dotenv": "^16.0.1",
         "express": "^4.18.1",
+        "express-async-errors": "^3.1.1",
         "lodash": "^4.17.21",
         "mongoose": "^6.4.2",
         "nodemon": "^2.0.18"
     },
     "devDependencies": {
+        "cross-env": "^7.0.3",
         "eslint": "^8.18.0",
-        "jest": "^28.1.2"
+        "jest": "^28.1.2",
+        "supertest": "^6.2.4"
     },
     "jest": {
         "testEnvironment": "node"
