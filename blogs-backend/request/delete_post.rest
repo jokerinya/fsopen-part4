@@ -1,0 +1,4 @@
+DELETE http://localhost:3001/api/v1/blogs/1
+
+###
+DELETE http://localhost:3001/api/v1/blogs/45lj64664l4445j221

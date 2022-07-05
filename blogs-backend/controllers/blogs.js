@@ -7,12 +7,11 @@ blogRouter.get('/', async (request, response) => {
 });
 
 blogRouter.post('/', async (request, response) => {
-    const { author, url, likes, title } = new Blog(request.body);
+    const { author, url, likes, title } = request.body;
 
     if (!author || !url || !title) {
         return response.status(400).json({
-            error:
-                'make sure all required fields are sended (title, author, url)',
+            error: 'make sure all required fields are sended (title, author, url)',
         });
     }
 
@@ -36,4 +35,33 @@ blogRouter.get('/:id', async (request, response) => {
     }
 });
 
+blogRouter.delete('/:id', async (request, response) => {
+    await Blog.findByIdAndRemove(request.params.id);
+    response.status(204).end();
+});
+
+blogRouter.put('/:id', async (request, response) => {
+    const { author, url, likes, title } = request.body;
+
+    if (!author || !url || !title || !likes) {
+        return response.status(400).json({
+            error: 'make sure all required fields are sended (title, author, url, likes)',
+        });
+    }
+
+    const blog = { url, author, title, likes };
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
+        new: true,
+        runValidators: true,
+        context: 'query',
+    });
+
+    if (updatedBlog) {
+        response.status(201).json(updatedBlog);
+    } else {
+        response.status(400).json({
+            error: `No person with this id: '${request.params.id}'`,
+        });
+    }
+});
 module.exports = blogRouter;

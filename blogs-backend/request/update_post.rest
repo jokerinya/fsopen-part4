@@ -1,0 +1,22 @@
+PUT http://localhost:3001/api/v1/blogs/62bf5d763b534e9630294a82
+Content-Type: application/json
+
+{
+    "title": "Blog One",
+    "author": "Author One",
+    "url": "blog-one",
+    "likes": 9,
+    "id": "62bf5d763b534e9630294a82"
+}
+
+###
+PUT http://localhost:3001/api/v1/blogs/62bf5d763b534e9630294a82
+Content-Type: application/json
+
+{
+    "title": "Blog One",
+    "author": "Author One",
+    "url": "blog-one",
+    "likes": 9,
+    "id": "62bf5d763b534e9630294a82"
+}

@@ -56,4 +56,9 @@ const blogsInDb = async () => {
     return blogs.map((blog) => blog.toJSON());
 };
 
-module.exports = { initialBlogs, blogsInDb };
+const randomBlog = async () => {
+    const blogs = await blogsInDb();
+    return blogs[Math.floor(Math.random() * blogs.length)];
+};
+
+module.exports = { initialBlogs, blogsInDb, randomBlog };

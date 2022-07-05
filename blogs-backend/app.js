@@ -29,5 +29,6 @@ app.use(middlewares.requestLogger);
 app.use('/api/v1/blogs', blogRouter);
 
 // This must be the last middleware
+app.use(middlewares.errorHandler);
 
 module.exports = app;
