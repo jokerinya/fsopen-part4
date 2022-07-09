@@ -1,4 +1,5 @@
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 const initialBlogs = [
     {
@@ -61,4 +62,9 @@ const randomBlog = async () => {
     return blogs[Math.floor(Math.random() * blogs.length)];
 };
 
-module.exports = { initialBlogs, blogsInDb, randomBlog };
+const usersInDb = async () => {
+    const users = await User.find({});
+    return users.map((u) => u.toJSON());
+};
+
+module.exports = { initialBlogs, blogsInDb, randomBlog, usersInDb };

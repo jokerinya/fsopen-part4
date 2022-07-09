@@ -3,6 +3,7 @@ const supertest = require('supertest');
 
 const app = require('../app');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 const helper = require('./tests_helper');
 // creates a test express app
@@ -10,17 +11,29 @@ const api = supertest(app);
 
 beforeEach(async () => {
     await Blog.deleteMany({});
-    console.log('cleared');
+    await User.deleteMany({});
+    console.log('db cleared');
 
+    const testUserObj = {
+        username: 'testuser',
+        name: 'Test User',
+        password: 'password',
+    };
+
+    await api.post('/api/v1/users').send(testUserObj);
+    const testUser = await User.findOne({ username: testUserObj.username });
     /* This will make async call in an order and prevents error */
-    const blogObjects = helper.initialBlogs.map((blog) => new Blog(blog));
+    const blogObjects = helper.initialBlogs.map(
+        (blog) => new Blog({ ...blog, user: testUser.id })
+    );
     const promiseArray = blogObjects.map((blog) => blog.save());
-    await Promise.all(promiseArray);
-
-    console.log('done');
+    const savedBlogs = await Promise.all(promiseArray);
+    testUser.blogs = savedBlogs.map((blog) => blog._id);
+    await testUser.save();
+    console.log('fake data added 1 user, 6 blogs');
 });
 
-describe('when there is initially some blogs saved', () => {
+describe.only('when there is initially some blogs saved', () => {
     test('blog post are in the JSON format', async () => {
         await api
             .get('/api/v1/blogs')
@@ -41,7 +54,20 @@ describe('when there is initially some blogs saved', () => {
     });
 });
 
-describe('addition of a new blog', () => {
+describe.only('addition of a new blog', () => {
+    let token = null;
+    beforeEach(async () => {
+        // get jwt
+        const testUserCredentials = {
+            username: 'testuser',
+            password: 'password',
+        };
+        const result = await api
+            .post('/api/v1/login')
+            .send(testUserCredentials);
+
+        token = result.body.token;
+    });
     test('successfully creates a new blog post', async () => {
         const newBlog = {
             url: 'https://github.com/jokerinya',
@@ -53,14 +79,31 @@ describe('addition of a new blog', () => {
         const { body } = await api
             .post('/api/v1/blogs')
             .send(newBlog)
+            .set('authorization', `bearer ${token}`)
             .expect(201)
             .expect('Content-Type', /application\/json/);
 
         const blogsAfterSaving = await helper.blogsInDb();
         expect(blogsAfterSaving).toHaveLength(helper.initialBlogs.length + 1);
         const createdBlog = { ...body };
-        newBlog['id'] = createdBlog.id; // add id property to newBlog
-        expect(createdBlog).toEqual(newBlog);
+        expect(createdBlog.title).toEqual(newBlog.title);
+    });
+
+    test('creation fails with proper statuscode if token is not provided', async () => {
+        const newBlogWithoutTitle = {
+            url: 'https://github.com/jokerinya',
+            likes: 100,
+            author: 'Ibrahim Sakaci',
+        };
+
+        await api
+            .post('/api/v1/blogs')
+            .send(newBlogWithoutTitle)
+            // .set('authorization', `bearer ${token}`)
+            .expect(401);
+        expect(await helper.blogsInDb()).toHaveLength(
+            helper.initialBlogs.length
+        );
     });
 
     test('if likes property is missing, it will default to the value 0', async () => {
@@ -72,12 +115,12 @@ describe('addition of a new blog', () => {
 
         const { body } = await api
             .post('/api/v1/blogs')
-            .send(newBlogWithoutLikes);
+            .send(newBlogWithoutLikes)
+            .set('authorization', `bearer ${token}`);
 
         const blogsAfterSaving = await helper.blogsInDb();
         expect(blogsAfterSaving).toHaveLength(helper.initialBlogs.length + 1);
         const createdBlog = { ...body };
-
         expect(createdBlog.likes).toBe(0);
     });
 
@@ -89,7 +132,11 @@ describe('addition of a new blog', () => {
             author: 'Ibrahim Sakaci',
         };
 
-        await api.post('/api/v1/blogs').send(newBlogWithoutTitle).expect(400);
+        await api
+            .post('/api/v1/blogs')
+            .send(newBlogWithoutTitle)
+            .set('authorization', `bearer ${token}`)
+            .expect(400);
         expect(await helper.blogsInDb()).toHaveLength(
             helper.initialBlogs.length
         );
@@ -100,7 +147,11 @@ describe('addition of a new blog', () => {
             title: 'Github page of me.',
         };
 
-        await api.post('/api/v1/blogs').send(newBlogWithoutUrl).expect(400);
+        await api
+            .post('/api/v1/blogs')
+            .send(newBlogWithoutUrl)
+            .set('authorization', `bearer ${token}`)
+            .expect(400);
         expect(await helper.blogsInDb()).toHaveLength(
             helper.initialBlogs.length
         );
@@ -117,7 +168,7 @@ describe('deleting a blog', () => {
 });
 
 describe('updating a blog', () => {
-    test.only('updating likes of a blog', async () => {
+    test('updating likes of a blog', async () => {
         const aRandomBlogInDB = await helper.randomBlog();
         const updatedBlog = {
             ...aRandomBlogInDB,
@@ -132,6 +183,8 @@ describe('updating a blog', () => {
     });
 });
 
-afterAll(() => {
+afterAll(async () => {
+    await Blog.deleteMany({});
+    await User.deleteMany({});
     mongoose.connection.close();
 });

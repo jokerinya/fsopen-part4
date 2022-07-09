@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/v1/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Impva2VyaW55YSIsImlkIjoiNjJjOWNmNjAzMzE5MjUzYWZmOWVmN2E5IiwiaWF0IjoxNjU3Mzk0ODg2LCJleHAiOjE2NTk5ODY4ODZ9.InZgDAFMylimGOV9n8iDPRIvYYbFNiMP7h6Uzh0nQxU
+
+{
+    "title": "100 seconds",
+    "author": "Author One",
+    "url": "blog-one",
+    "likes": 5
+}

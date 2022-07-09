@@ -8,6 +8,8 @@ const logger = require('./utils/logger');
 const middlewares = require('./utils/middlewares');
 
 const blogRouter = require('./controllers/blogs');
+const usersRouter = require('./controllers/users');
+const loginRouter = require('./controllers/login');
 
 const app = express();
 
@@ -23,10 +25,13 @@ mongoose
 /* Middlewares */
 app.use(cors());
 app.use(express.json());
+app.use(middlewares.tokenExtractor);
 app.use(middlewares.requestLogger);
 
 /* Routers */
 app.use('/api/v1/blogs', blogRouter);
+app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/login', loginRouter);
 
 // This must be the last middleware
 app.use(middlewares.errorHandler);
