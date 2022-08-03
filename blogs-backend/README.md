@@ -432,4 +432,4 @@ After adding token based authentication the tests for adding a new blog broke do
 
 ---
 
-This is the last exercise for this part of the course and it's time to push your code to GitHub and mark all of your finished exercises to the exercise submission system.
+This is the last exercise for this part of the course and it's time to push your code to GitHub and mark all of your finished exercises to the [exercise submission system.](https://studies.cs.helsinki.fi/stats/courses/fullstackopen).
